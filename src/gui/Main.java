@@ -1,5 +1,7 @@
 package gui;
 
+import csp.ConstraintValidator;
+import csp.ConstraintValidatorFactory;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -7,7 +9,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -138,7 +139,16 @@ public class Main extends Application {
         });
     }
 
+
     public static void main(String[] args) {
-        launch(args);
+        //launch(args);
+        String[] arguments = new String[3];
+        arguments[0] = "x";
+        arguments[1] = "y";
+        arguments[2] = "z";
+        ConstraintValidator c = ConstraintValidatorFactory.createConstraint(arguments, "x + y < 2 * z");
+        System.out.println(c.check(1,2,3));
+
+
     }
 }
