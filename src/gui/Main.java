@@ -121,7 +121,7 @@ public class Main extends Application {
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
-                                gui.update(search);
+                                //gui.update(search);
                             }
                         });
                     }
@@ -132,7 +132,7 @@ public class Main extends Application {
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
-                                gui.update(search);
+                                //gui.update(search);
                             }
                         });
                     }

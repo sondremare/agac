@@ -37,7 +37,12 @@ public class GACState implements State {
         for (Map.Entry<Integer, VariableInstance> entry : gacState.getVariableInstances().entrySet()) {
             VariableInstance variable = entry.getValue();
             int index = variable.getIndex();
-            variableInstances.put(index, new VariableInstance(index, variable.getOriginalVariable(), variable.getCurrentDomain()));
+            /*ArrayList<Integer> currentDomain = new ArrayList<>();
+            for (Integer i : variable.getCurrentDomain()) {
+                currentDomain.add(new Integer(i));
+            }*/
+            ArrayList<Integer> currentDomain = (ArrayList<Integer>) variable.getCurrentDomain().clone();
+            variableInstances.put(index, new VariableInstance(index, variable.getOriginalVariable(), currentDomain));
         }
         for (ConstraintInstance constraint : gacState.getConstraintInstances()) {
             ArrayList<VariableInstance> constraintVariableInstances = new ArrayList<>();
@@ -68,7 +73,7 @@ public class GACState implements State {
 
     @Override
     public float getGCost() {
-        return 1;
+        return 1; //TODO WHAT TO DO
     }
 
     @Override

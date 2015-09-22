@@ -3,6 +3,7 @@ package gac;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.ListIterator;
 
 public class GAC {
     private HashMap<Integer, Variable> variables;
@@ -31,18 +32,23 @@ public class GAC {
     }
 
     public static void domainFiltering(GACState gac) {
-        Iterator<Revision> iterator = gac.getReviseQueue().iterator();
+        ListIterator<Revision> iterator = gac.getReviseQueue().listIterator();
         while (iterator.hasNext()) {
             Revision revision = iterator.next();
             iterator.remove();
             if (revise(revision) ) {
-                gac.getReviseQueue().addAll(getAffectedRevisions(gac, revision, true));
+                for (Revision newRevision : getAffectedRevisions(gac, revision, true)) {
+                    iterator.add(newRevision); //TO need to call prev?
+                }
+                //gac.getReviseQueue().addAll(getAffectedRevisions(gac, revision, true));
             }
         }
     }
 
-    public static void rerun(GACState gac) {
-
+    public static void rerun(GACState gac, VariableInstance focalVariable) {
+        Revision rev = new Revision(focalVariable, null);
+        gac.getReviseQueue().addAll(getAffectedRevisions(gac, rev, false));
+        domainFiltering(gac);
     }
 
     private static ArrayList<Revision> getAffectedRevisions(GACState gac, Revision revision, boolean excludeCurrentConstraint) {
@@ -70,17 +76,21 @@ public class GAC {
         ConstraintValidator validator = constraint.getOriginalConstraint().getConstraintValidator();
         int[] values = new int[constraint.getVariableInstances().size()];
         ArrayList<VariableInstance> nonFocalVariables = getNonFocalVariables(focalVariable, constraint.getVariableInstances());
-        for (int i : focalVariable.getCurrentDomain()) {
+        Iterator<Integer> iterator = focalVariable.getCurrentDomain().iterator();
+        while(iterator.hasNext()) {
+            int i = iterator.next();
             values[0] = i;
-            if (!recurse(validator, values, 0, nonFocalVariables)) {
-                focalVariable.getCurrentDomain().remove(i);
+            if (!checkVariableDomains(validator, values, 0, nonFocalVariables)) {
+                iterator.remove();
+                //focalVariable.getCurrentDomain().remove(i);
                 revised = true;
             }
         }
         return revised;
     }
 
-    public static boolean recurse(ConstraintValidator validator,int[] values, int nonFocalVariableCounter, ArrayList<VariableInstance> nonFocalVariables) {
+        //TODO FIX THIS GENERIC VERSION
+   /* public static boolean checkVariableDomains(ConstraintValidator validator, int[] values, int nonFocalVariableCounter, ArrayList<VariableInstance> nonFocalVariables) {
         VariableInstance variable = nonFocalVariables.get(nonFocalVariableCounter);
         int valueIndex = nonFocalVariableCounter + 1;
         boolean constraintValid = false;
@@ -91,9 +101,23 @@ public class GAC {
                     return true;
                 }
             } else {
-                if (recurse(validator, values, nonFocalVariableCounter++, nonFocalVariables)) {
+                if (checkVariableDomains(validator, values, nonFocalVariableCounter++, nonFocalVariables)) {
                     constraintValid = true;
                 }
+            }
+        }
+        return constraintValid;
+    } */
+
+    /** Lame version for just 2 parameters */
+    public static boolean checkVariableDomains(ConstraintValidator validator, int[] values, int nonFocalVariableCounter, ArrayList<VariableInstance> nonFocalVariables) {
+        VariableInstance variable = nonFocalVariables.get(nonFocalVariableCounter);
+        int valueIndex = 1;//nonFocalVariableCounter + 1;
+        boolean constraintValid = false;
+        for (int i = 0; i < variable.getCurrentDomain().size(); i++) {
+            values[1] = variable.getCurrentDomain().get(i);
+            if (validator.check(values)) {
+                    constraintValid = true;
             }
         }
         return constraintValid;
@@ -103,5 +127,14 @@ public class GAC {
         ArrayList<VariableInstance> nonFocalVariables = new ArrayList<>(variables);
         nonFocalVariables.remove(focalVariable);
         return nonFocalVariables;
+    }
+
+    public static boolean hasEmptyDomain(GACState gacState) {
+        for (VariableInstance variableInstance : gacState.getVariableInstances().values()) {
+            if (variableInstance.getCurrentDomain().size() == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }

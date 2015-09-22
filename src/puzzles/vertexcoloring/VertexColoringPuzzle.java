@@ -9,16 +9,20 @@ public class VertexColoringPuzzle implements Puzzle{
     private GAC gac;
     private GACState gacState;
     private VertexResultFunction vertexResultFunction;
+    private VertexHeuristic vertexHeuristic;
+    private VertexGoalTest vertexGoalTest;
 
     public VertexColoringPuzzle(GAC gac, GACState gacState) {
         this.gac = gac;
         this.gacState = gacState;
         this.vertexResultFunction = new VertexResultFunction();
+        this.vertexHeuristic = new VertexHeuristic();
+        this.vertexGoalTest = new VertexGoalTest();
     }
 
     @Override
     public Heuristic getHeuristic() {
-        return null;
+        return vertexHeuristic;
     }
 
     @Override
@@ -38,6 +42,6 @@ public class VertexColoringPuzzle implements Puzzle{
 
     @Override
     public GoalTest getGoalTest() {
-        return null;
+        return vertexGoalTest;
     }
 }

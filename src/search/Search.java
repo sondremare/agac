@@ -128,6 +128,7 @@ public class Search {
 
             /** We check if the current search node is in the desired goal state */
             if (puzzle.getGoalTest().isGoalState(currentNode.getState())) {
+                System.out.println("GOAL");
                 break;
             }
 

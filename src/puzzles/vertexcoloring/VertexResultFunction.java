@@ -1,5 +1,6 @@
 package puzzles.vertexcoloring;
 
+import gac.GAC;
 import gac.GACState;
 import gac.Variable;
 import gac.VariableInstance;
@@ -24,10 +25,11 @@ public class VertexResultFunction implements ResultFunction {
             VariableInstance variableInstance = childState.getVariableInstances().get(variableWithSmallestDomain.getIndex());
             variableInstance.setCurrentDomain(newDomain);
             childState.getVariableInstances().put(variableWithSmallestDomain.getIndex(), variableInstance);
-            newStates.add(childState);
+            GAC.rerun(childState, variableInstance);
+            if (!GAC.hasEmptyDomain(childState)) {
+                newStates.add(childState);
+            }
         }
-        //TODO check for validity
-        //revise
         return newStates;
     }
 
@@ -39,14 +41,14 @@ public class VertexResultFunction implements ResultFunction {
                     if (v2.getCurrentDomain().size() == DEDUCED) {
                         return 0;
                     } else {
-                        return -1;
+                        return 1;
                     }
                 } else if (v2.getCurrentDomain().size() == DEDUCED) {
-                    return 1;
-                } else if (v1.getCurrentDomain().size() < v2.getCurrentDomain().size()) {
-                    return 1;
-                } else if (v1.getCurrentDomain().size() > v2.getCurrentDomain().size()) {
                     return -1;
+                } else if (v1.getCurrentDomain().size() < v2.getCurrentDomain().size()) {
+                    return -1;
+                } else if (v1.getCurrentDomain().size() > v2.getCurrentDomain().size()) {
+                    return 1;
                 }
                 else return 0;
             }
