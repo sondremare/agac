@@ -1,7 +1,7 @@
 package gui;
 
-import csp.ConstraintValidator;
-import csp.ConstraintValidatorFactory;
+import gac.GAC;
+import gac.GACState;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -12,17 +12,17 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import puzzles.navigation.GridState;
 import puzzles.navigation.NavigationPuzzle;
-import puzzles.navigation.gui.NavigationGUI;
-import puzzles.navigation.io.file.GridReader;
+import puzzles.vertexcoloring.VertexColoringPuzzle;
+import puzzles.vertexcoloring.io.file.VertexReader;
 import search.*;
 
 import java.io.File;
 
 public class Main extends Application {
 
-    private NavigationPuzzle puzzle;
+    //private NavigationPuzzle puzzle;
+    private VertexColoringPuzzle puzzle;
     private GUI gui;
     private Search search;
 
@@ -69,18 +69,28 @@ public class Main extends Application {
         openFileButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                File gridDirectory = new File("D:\\School\\AiProgramming\\astar\\resources\\navigation\\");
+
+                //TODO make this puzzle independant
+                File gridDirectory = new File("D:\\School\\AiProgramming\\agac\\resources\\vertex\\");
                 if (gridDirectory != null && gridDirectory.exists()) {
                     fileChooser.setInitialDirectory(gridDirectory);
                 }
                 File file = fileChooser.showOpenDialog(primaryStage);
 
-                GridState state = GridReader.loadFile(file);
+                /*GridState state = GridReader.loadFile(file);
                 if (state != null) {
                     puzzle = new NavigationPuzzle(state);
                     gui = new NavigationGUI(puzzle);
                     GridPane guiRoot = gui.initGUI();
                     gridPane.add(guiRoot, 0, 1);
+                    startSearchButton.setDisable(false);
+                } else {
+                    startSearchButton.setDisable(true);
+                }*/
+                GAC gac = VertexReader.loadFile(file);
+                GACState gacState = new GACState(gac);
+                if (gacState != null) {
+                    puzzle = new VertexColoringPuzzle(gac, gacState);
                     startSearchButton.setDisable(false);
                 } else {
                     startSearchButton.setDisable(true);
@@ -141,13 +151,13 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-        //launch(args);
-        String[] arguments = new String[3];
+        launch(args);
+        /*String[] arguments = new String[3];
         arguments[0] = "x";
         arguments[1] = "y";
         arguments[2] = "z";
         ConstraintValidator c = ConstraintValidatorFactory.createConstraint(arguments, "x + y < 2 * z");
-        System.out.println(c.check(1,2,3));
+        System.out.println(c.check(1,2,3));*/
 
 
     }

@@ -65,12 +65,6 @@ public class GridState implements State {
     }
 
     @Override
-    public boolean isGoalState(State state) {
-        GridState gridState = (GridState) state;
-        return gridState.getGoalPosition().equals(gridState.getCurrentPosition());
-    }
-
-    @Override
     public boolean equals(State state) {
         GridState gridState = (GridState) state;
         return getCurrentPosition().equals(gridState.getCurrentPosition());

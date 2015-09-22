@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Search {
@@ -78,10 +79,11 @@ public class Search {
      */
     public ArrayList<Node> generateAllSuccessors(Node currentNode, Puzzle puzzle) {
         ArrayList<Node> children = new ArrayList<>();
-        for (Action action : puzzle.getActions()) {
-            ResultFunction resultFunction = puzzle.getResultFunction();
-            State state = resultFunction.result(action, currentNode.getState());
-            if (state != null) {
+        ResultFunction resultFunction = puzzle.getResultFunction();
+        ArrayList<Action> actions = new ArrayList<Action>(Arrays.asList(puzzle.getActions()));
+        ArrayList<State> states = resultFunction.result(actions, currentNode.getState());
+        if (states != null) {
+            for (State state : states) {
                 Node childNode = new Node(state, currentNode.getG(), puzzle.getHeuristic().calculateHeuristicValue(state));
                 children.add(childNode);
             }
