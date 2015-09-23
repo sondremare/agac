@@ -62,6 +62,9 @@ public class Main extends Application {
         startSearchButton = new Button("Start Search");
         startSearchButton.setDisable(true);
 
+        Button stopSearchButton = new Button("Stop Search");
+        stopSearchButton.setDisable(true);
+
         Label sleepTimeLabel = new Label ("Sleep (ms): ");
         final TextField sleepTimeInput = new TextField();
         sleepTimeInput.setMaxWidth(50);
@@ -99,6 +102,7 @@ public class Main extends Application {
         controlPane.add(kValueLabel, 0, 5);
         controlPane.add(kValueInput, 1, 5);
         controlPane.add(startSearchButton, 0, 6);
+        controlPane.add(stopSearchButton, 0, 7);
 
         gridPane = new GridPane();
         gridPane.setPrefSize(1200, 1000);
@@ -138,6 +142,7 @@ public class Main extends Application {
                 if (search != null) {
                     search.stop();
                 }
+                stopSearchButton.setDisable(false);
                 Search.sleepTime = Integer.parseInt(sleepTimeInput.getText());
                 if (bestFirst.isSelected()) {
                     search = new BestFirstSearch(puzzle);
@@ -178,6 +183,14 @@ public class Main extends Application {
                         search.search();
                     }
                 }).start();
+            }
+        });
+
+        stopSearchButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                search.stop();
+                stopSearchButton.setDisable(true);
             }
         });
     }

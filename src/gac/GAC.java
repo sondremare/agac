@@ -38,9 +38,9 @@ public class GAC {
             iterator.remove();
             if (revise(revision) ) {
                 for (Revision newRevision : getAffectedRevisions(gac, revision, true)) {
-                    iterator.add(newRevision); //TO need to call prev?
+                    iterator.add(newRevision);
+                    iterator.previous();
                 }
-                //gac.getReviseQueue().addAll(getAffectedRevisions(gac, revision, true));
             }
         }
     }
@@ -82,7 +82,6 @@ public class GAC {
             values[0] = i;
             if (!checkVariableDomains(validator, values, 0, nonFocalVariables)) {
                 iterator.remove();
-                //focalVariable.getCurrentDomain().remove(i);
                 revised = true;
             }
         }
