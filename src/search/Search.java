@@ -1,6 +1,5 @@
 package search;
 
-import gui.GUI;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -97,7 +96,7 @@ public class Search {
     }
 
     /** This function tries to find a solution to a given puzzle using search */
-    public boolean search(GUI gui) {
+    public boolean search() {
         shouldStop = false;
 
         /** Initialization of the state, lists, and search node */

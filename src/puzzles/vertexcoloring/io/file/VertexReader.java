@@ -1,6 +1,7 @@
 package puzzles.vertexcoloring.io.file;
 
 import gac.*;
+import puzzles.vertexcoloring.gui.VertexColoringGUI;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,23 +9,26 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class VertexReader {
 
     private static final int DIMENSIONS = 0;
     private static final int START_AND_GOAL = 1;;
 
-    public static GAC loadFile(File file) {
+    public static GAC loadFile(File file, int k) {
         int numberOfVertices = 0;
         int numberOfEdges = 0;
         HashMap<Integer, Variable> variables = new HashMap<>();
-        //ArrayList<Variable> variables = new ArrayList<>();
         ArrayList<Constraint> constraints = new ArrayList<>();
         if (file != null) {
             try {
                 FileReader fileReader = new FileReader(file);
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
-
+                double lowestXValue = Double.MAX_VALUE;
+                double lowestYValue = Double.MAX_VALUE;
+                double highestXValue = -Double.MAX_VALUE;
+                double highestYValue = -Double.MAX_VALUE;
                 int counter = 0;
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
@@ -36,14 +40,17 @@ public class VertexReader {
                         int vertexIndex = Integer.parseInt(splitValues[0]);
                         double vertexXpos = Double.parseDouble(splitValues[1]);
                         double vertexYpos = Double.parseDouble(splitValues[2]);
-                        //TODO fix dynamic K
+                        if (vertexXpos < lowestXValue) lowestXValue = vertexXpos;
+                        if (vertexYpos < lowestYValue) lowestYValue = vertexYpos;
+                        if (vertexXpos > highestXValue) highestXValue = vertexXpos;
+                        if (vertexYpos > highestYValue) highestYValue = vertexYpos;
+
                         ArrayList<Integer> domain = new ArrayList<>();
-                        for (int i = 0; i < 4; i++) {
+                        for (int i = 0; i < k; i++) {
                             domain.add(i);
                         }
                         Variable variable = new Variable(vertexIndex, domain, vertexXpos, vertexYpos);
                         variables.put(vertexIndex, variable);
-                        //variables.add(variable);
                     } else {
                         int edgeFirstVertex = Integer.parseInt(splitValues[0]);
                         int edgeSecondVertex = Integer.parseInt(splitValues[1]);
@@ -60,6 +67,13 @@ public class VertexReader {
                         constraints.add(constraint);
                     }
                     counter++;
+                }
+
+                double xScale = VertexColoringGUI.WIDTH/(Math.abs(lowestXValue) + Math.abs(highestXValue));
+                double yScale = VertexColoringGUI.HEIGHT/(Math.abs(highestYValue) + Math.abs(highestYValue));
+                for (Variable var : variables.values()) {
+                    var.setxPos((var.getxPos() + Math.abs(lowestXValue))*xScale);
+                    var.setyPos((var.getyPos() + Math.abs(lowestYValue))*yScale);
                 }
             } catch (IOException io) {
                 System.err.println("Failed to read file");

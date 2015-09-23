@@ -4,6 +4,8 @@ import gac.GAC;
 import gac.GACState;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,6 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import puzzles.navigation.NavigationPuzzle;
 import puzzles.vertexcoloring.VertexColoringPuzzle;
+import puzzles.vertexcoloring.gui.VertexColoringGUI;
 import puzzles.vertexcoloring.io.file.VertexReader;
 import search.*;
 
@@ -25,6 +28,30 @@ public class Main extends Application {
     private VertexColoringPuzzle puzzle;
     private GUI gui;
     private Search search;
+    private File file;
+    private GridPane gridPane;
+    private Button startSearchButton;
+
+    public void initPuzzle(String kValue) {
+        try {
+            int kVal = Integer.parseInt(kValue);
+            startSearchButton.setDisable(true);
+            GAC gac = VertexReader.loadFile(file, kVal);
+            if (gac != null) {
+                GACState gacState = new GACState(gac);
+                puzzle = new VertexColoringPuzzle(gac, gacState);
+                gui = new VertexColoringGUI(puzzle);
+                GridPane guiRoot = gui.initGUI();
+                gridPane.add(guiRoot, 1, 0);
+                startSearchButton.setDisable(false);
+            } else {
+                startSearchButton.setDisable(true);
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -32,13 +59,25 @@ public class Main extends Application {
         final FileChooser fileChooser = new FileChooser();
 
         Button openFileButton = new Button("Choose file");
-        Button startSearchButton = new Button("Start Search");
+        startSearchButton = new Button("Start Search");
         startSearchButton.setDisable(true);
 
         Label sleepTimeLabel = new Label ("Sleep (ms): ");
         final TextField sleepTimeInput = new TextField();
         sleepTimeInput.setMaxWidth(50);
         sleepTimeInput.setText("50");
+
+        Label kValueLabel = new Label("K: ");
+        final TextField kValueInput = new TextField();
+        kValueInput.setMaxWidth(50);
+        kValueInput.setText("4");
+
+        kValueInput.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                initPuzzle(newValue);
+            }
+        });
 
         ToggleGroup searchType = new ToggleGroup();
         RadioButton bestFirst = new RadioButton("Best-First");
@@ -57,10 +96,12 @@ public class Main extends Application {
         controlPane.add(breadthFirst, 0, 3);
         controlPane.add(sleepTimeLabel, 0, 4);
         controlPane.add(sleepTimeInput, 1, 4);
-        controlPane.add(startSearchButton, 0, 5);
+        controlPane.add(kValueLabel, 0, 5);
+        controlPane.add(kValueInput, 1, 5);
+        controlPane.add(startSearchButton, 0, 6);
 
-        final GridPane gridPane = new GridPane();
-        gridPane.setPrefSize(600, 800);
+        gridPane = new GridPane();
+        gridPane.setPrefSize(1200, 1000);
         gridPane.add(controlPane, 0, 0);
 
         primaryStage.setScene(new Scene(gridPane));
@@ -75,7 +116,7 @@ public class Main extends Application {
                 if (gridDirectory != null && gridDirectory.exists()) {
                     fileChooser.setInitialDirectory(gridDirectory);
                 }
-                File file = fileChooser.showOpenDialog(primaryStage);
+                file = fileChooser.showOpenDialog(primaryStage);
 
                 /*GridState state = GridReader.loadFile(file);
                 if (state != null) {
@@ -87,15 +128,7 @@ public class Main extends Application {
                 } else {
                     startSearchButton.setDisable(true);
                 }*/
-                GAC gac = VertexReader.loadFile(file);
-                GACState gacState = new GACState(gac);
-                if (gacState != null) {
-                    puzzle = new VertexColoringPuzzle(gac, gacState);
-                    startSearchButton.setDisable(false);
-                } else {
-                    startSearchButton.setDisable(true);
-                }
-
+                initPuzzle(kValueInput.getText());
             }
         });
 
@@ -121,7 +154,7 @@ public class Main extends Application {
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
-                                //gui.update(search);
+                                gui.update(search);
                             }
                         });
                     }
@@ -132,7 +165,7 @@ public class Main extends Application {
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
-                                //gui.update(search);
+                                gui.update(search);
                             }
                         });
                     }
@@ -142,7 +175,7 @@ public class Main extends Application {
 
                     @Override
                     public void run() {
-                        search.search(gui);
+                        search.search();
                     }
                 }).start();
             }
@@ -152,13 +185,5 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
-        /*String[] arguments = new String[3];
-        arguments[0] = "x";
-        arguments[1] = "y";
-        arguments[2] = "z";
-        ConstraintValidator c = ConstraintValidatorFactory.createConstraint(arguments, "x + y < 2 * z");
-        System.out.println(c.check(1,2,3));*/
-
-
     }
 }

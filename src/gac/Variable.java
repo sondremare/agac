@@ -27,7 +27,15 @@ public class Variable {
         return xPos;
     }
 
+    public void setxPos(double xPos) {
+        this.xPos = xPos;
+    }
+
     public double getyPos() {
         return yPos;
+    }
+
+    public void setyPos(double yPos) {
+        this.yPos = yPos;
     }
 }
