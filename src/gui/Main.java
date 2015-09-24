@@ -1,5 +1,7 @@
 package gui;
 
+import gac.ConstraintValidator;
+import gac.ConstraintValidatorFactory;
 import gac.GAC;
 import gac.GACState;
 import javafx.application.Application;
@@ -197,6 +199,15 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-        launch(args);
+        launch(args); //{0:05b}'.format(x)
+        String[] variableNames = {"x","y"};
+        //ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, "bin(x) & 0b10000 == bin(y) & 0b01000");
+        //ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, "'{0:05b}'.format(x) & 0b10000 == '{0:05b}'.format(y) & 0b01000");
+        //ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, "(0b11100 & 0b10000) == (0b11110 & 0b01000)");
+        //ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, "(0b11100 & 0b10000 == 0) == (0b11110 & 0b01000 == 0)");
+        ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, "(x & 0b10000 == 0) == (y & 0b01000 == 0)");
+        int[] values = {Integer.parseInt("01100",2), Integer.parseInt("10110", 2)};
+        System.out.println(validator.check(values));
+
     }
 }
