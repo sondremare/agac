@@ -88,8 +88,7 @@ public class GAC {
         return revised;
     }
 
-        //TODO FIX THIS GENERIC VERSION
-   /* public static boolean checkVariableDomains(ConstraintValidator validator, int[] values, int nonFocalVariableCounter, ArrayList<VariableInstance> nonFocalVariables) {
+    public static boolean checkVariableDomains(ConstraintValidator validator, int[] values, int nonFocalVariableCounter, ArrayList<VariableInstance> nonFocalVariables) {
         VariableInstance variable = nonFocalVariables.get(nonFocalVariableCounter);
         int valueIndex = nonFocalVariableCounter + 1;
         boolean constraintValid = false;
@@ -103,20 +102,6 @@ public class GAC {
                 if (checkVariableDomains(validator, values, nonFocalVariableCounter++, nonFocalVariables)) {
                     constraintValid = true;
                 }
-            }
-        }
-        return constraintValid;
-    } */
-
-    /** Lame version for just 2 parameters */
-    public static boolean checkVariableDomains(ConstraintValidator validator, int[] values, int nonFocalVariableCounter, ArrayList<VariableInstance> nonFocalVariables) {
-        VariableInstance variable = nonFocalVariables.get(nonFocalVariableCounter);
-        int valueIndex = 1;//nonFocalVariableCounter + 1;
-        boolean constraintValid = false;
-        for (int i = 0; i < variable.getCurrentDomain().size(); i++) {
-            values[1] = variable.getCurrentDomain().get(i);
-            if (validator.check(values)) {
-                    constraintValid = true;
             }
         }
         return constraintValid;

@@ -105,7 +105,7 @@ public class Main extends Application {
         controlPane.add(stopSearchButton, 0, 7);
 
         gridPane = new GridPane();
-        gridPane.setPrefSize(1200, 1000);
+        gridPane.setPrefSize(1200, 800);
         gridPane.add(controlPane, 0, 0);
 
         primaryStage.setScene(new Scene(gridPane));

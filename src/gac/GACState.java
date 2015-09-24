@@ -37,10 +37,6 @@ public class GACState implements State {
         for (Map.Entry<Integer, VariableInstance> entry : gacState.getVariableInstances().entrySet()) {
             VariableInstance variable = entry.getValue();
             int index = variable.getIndex();
-            /*ArrayList<Integer> currentDomain = new ArrayList<>();
-            for (Integer i : variable.getCurrentDomain()) {
-                currentDomain.add(new Integer(i));
-            }*/
             ArrayList<Integer> currentDomain = (ArrayList<Integer>) variable.getCurrentDomain().clone();
             variableInstances.put(index, new VariableInstance(index, variable.getOriginalVariable(), currentDomain));
         }

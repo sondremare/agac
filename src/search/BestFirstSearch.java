@@ -33,6 +33,7 @@ public class BestFirstSearch extends Search {
         };
 
         Collections.sort(nodes, lowestFAndHValues);
+        System.out.println("Best H: "+nodes.get(0).getH());
         return nodes.get(0);
     }
 }

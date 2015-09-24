@@ -22,7 +22,7 @@ public class VertexColoringGUI implements GUI {
     private ArrayList<Line> lines = new ArrayList<>();
     private Pane pane;
     public static double WIDTH = 1000.0;
-    public static double HEIGHT = 800.0;
+    public static double HEIGHT = 700.0;
     public static double MARGIN = 30;
 
     public VertexColoringGUI(VertexColoringPuzzle puzzle) {
