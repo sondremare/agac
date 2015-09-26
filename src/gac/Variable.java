@@ -15,6 +15,11 @@ public class Variable {
         this.yPos = yPos;
     }
 
+    public Variable(int index, ArrayList<Integer> domain) {
+        this.index = index;
+        this.domain = domain;
+    }
+
     public int getIndex() {
         return index;
     }
