@@ -1,7 +1,5 @@
 package gui;
 
-import gac.ConstraintValidator;
-import gac.ConstraintValidatorFactory;
 import gac.GAC;
 import gac.GACState;
 import javafx.application.Application;
@@ -16,7 +14,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import puzzles.navigation.NavigationPuzzle;
+import puzzles.nonogram.NonogramPuzzle;
+import puzzles.nonogram.gui.NonogramGUI;
+import puzzles.nonogram.io.file.NonogramReader;
 import puzzles.vertexcoloring.VertexColoringPuzzle;
 import puzzles.vertexcoloring.gui.VertexColoringGUI;
 import puzzles.vertexcoloring.io.file.VertexReader;
@@ -27,7 +27,8 @@ import java.io.File;
 public class Main extends Application {
 
     //private NavigationPuzzle puzzle;
-    private VertexColoringPuzzle puzzle;
+    //private VertexColoringPuzzle puzzle;
+    private NonogramPuzzle puzzle;
     private GUI gui;
     private Search search;
     private File file;
@@ -35,7 +36,7 @@ public class Main extends Application {
     private Button startSearchButton;
 
     public void initPuzzle(String kValue) {
-        try {
+        /*try {
             int kVal = Integer.parseInt(kValue);
             startSearchButton.setDisable(true);
             GAC gac = VertexReader.loadFile(file, kVal);
@@ -51,7 +52,24 @@ public class Main extends Application {
             }
         } catch (Exception e) {
             //do nothing
+        }*/
+        try {
+            startSearchButton.setDisable(true);
+            GAC gac = NonogramReader.loadFile(file);
+            if (gac != null) {
+                GACState gacState = new GACState(gac);
+                puzzle = new NonogramPuzzle(gac, gacState);
+                gui = new NonogramGUI(puzzle);
+                GridPane guiRoot = gui.initGUI();
+                gridPane.add(guiRoot, 1, 0);
+                startSearchButton.setDisable(false);
+            } else {
+                startSearchButton.setDisable(true);
+            }
+        } catch (Exception e) {
+            //do nothing
         }
+
 
     }
 
@@ -118,7 +136,7 @@ public class Main extends Application {
             public void handle(ActionEvent event) {
 
                 //TODO make this puzzle independant
-                File gridDirectory = new File("D:\\School\\AiProgramming\\agac\\resources\\vertex\\");
+                File gridDirectory = new File("D:\\School\\AiProgramming\\agac\\resources\\nonogram\\");
                 if (gridDirectory != null && gridDirectory.exists()) {
                     fileChooser.setInitialDirectory(gridDirectory);
                 }

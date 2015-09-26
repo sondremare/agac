@@ -3,6 +3,7 @@ package puzzles.vertexcoloring.gui;
 import gac.VariableInstance;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import puzzles.vertexcoloring.VertexVariable;
 import puzzles.vertexcoloring.gui.VertexColoringGUI;
 
 import java.util.ArrayList;
@@ -13,8 +14,8 @@ public class Vertex extends Circle {
 
     public Vertex(VariableInstance variableInstance, Color color) {
         super(RADIUS, color);
-        double x = variableInstance.getOriginalVariable().getxPos() + VertexColoringGUI.MARGIN;
-        double y = variableInstance.getOriginalVariable().getyPos() + VertexColoringGUI.MARGIN;
+        double x = ((VertexVariable)variableInstance.getOriginalVariable()).getxPos() + VertexColoringGUI.MARGIN;
+        double y = ((VertexVariable)variableInstance.getOriginalVariable()).getyPos() + VertexColoringGUI.MARGIN;
         setLayoutX(x);
         setLayoutY(y);
     }

@@ -1,6 +1,7 @@
 package puzzles.vertexcoloring.io.file;
 
 import gac.*;
+import puzzles.vertexcoloring.VertexVariable;
 import puzzles.vertexcoloring.gui.VertexColoringGUI;
 
 import java.io.BufferedReader;
@@ -49,7 +50,7 @@ public class VertexReader {
                         for (int i = 0; i < k; i++) {
                             domain.add(i);
                         }
-                        Variable variable = new Variable(vertexIndex, domain, vertexXpos, vertexYpos);
+                        VertexVariable variable = new VertexVariable(vertexIndex, domain, vertexXpos, vertexYpos);
                         variables.put(vertexIndex, variable);
                     } else {
                         int edgeFirstVertex = Integer.parseInt(splitValues[0]);
@@ -72,8 +73,8 @@ public class VertexReader {
                 double xScale = VertexColoringGUI.WIDTH/(Math.abs(lowestXValue) + Math.abs(highestXValue));
                 double yScale = VertexColoringGUI.HEIGHT/(Math.abs(highestYValue) + Math.abs(highestYValue));
                 for (Variable var : variables.values()) {
-                    var.setxPos((var.getxPos() + Math.abs(lowestXValue))*xScale);
-                    var.setyPos((var.getyPos() + Math.abs(lowestYValue))*yScale);
+                    ((VertexVariable)var).setxPos((((VertexVariable) var).getxPos() + Math.abs(lowestXValue)) * xScale);
+                    ((VertexVariable)var).setyPos((((VertexVariable)var).getyPos() + Math.abs(lowestYValue)) * yScale);
                 }
             } catch (IOException io) {
                 System.err.println("Failed to read file");

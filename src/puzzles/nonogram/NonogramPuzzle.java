@@ -15,7 +15,7 @@ public class NonogramPuzzle implements Puzzle {
     private VertexHeuristic heuristic;
     private VertexGoalTest goalTest;
 
-    private NonogramPuzzle(GAC gac, GACState gacState) {
+    public NonogramPuzzle(GAC gac, GACState gacState) {
         this.gac = gac;
         this.gacState = gacState;
         this.vertexResultFunction = new VertexResultFunction();
@@ -36,7 +36,7 @@ public class NonogramPuzzle implements Puzzle {
 
     @Override
     public ResultFunction getResultFunction() {
-        return null;
+        return vertexResultFunction;
     }
 
     @Override

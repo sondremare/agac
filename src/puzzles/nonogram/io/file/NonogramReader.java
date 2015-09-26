@@ -1,20 +1,20 @@
 package puzzles.nonogram.io.file;
 
 import gac.*;
+import puzzles.nonogram.NonogramVariable;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class NonogramReader {
 
     private static final int DIMENSIONS = 0;
 
-    public static GAC loadFile(File file, int k) {
+    public static GAC loadFile(File file) {
         int numberOfColumns = 0;
         int numberOfRows = 0;
         HashMap<Integer, Variable> variables = new HashMap<>();
@@ -23,10 +23,6 @@ public class NonogramReader {
             try {
                 FileReader fileReader = new FileReader(file);
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
-                double lowestXValue = Double.MAX_VALUE;
-                double lowestYValue = Double.MAX_VALUE;
-                double highestXValue = -Double.MAX_VALUE;
-                double highestYValue = -Double.MAX_VALUE;
                 int counter = 0;
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
@@ -39,40 +35,38 @@ public class NonogramReader {
                         for (int i = 0; i < splitValues.length; i++) {
                             values[i] = Integer.parseInt(splitValues[i]);
                         }
-                        String[] emptyDomain = createZeroBitString(numberOfColumns).split("");
+                        char[] emptyDomain = createZereoBitCharArray(numberOfColumns);
                         ArrayList<Integer> domain = generateDomain(emptyDomain, values, 0, calculateWiggleRoom(values, numberOfColumns), 0);
-                        int index = (numberOfRows - 1) - 1 - counter;
-                        Variable variable = new Variable(index, domain);
+                        int index = numberOfRows - (counter);
+                        NonogramVariable variable = new NonogramVariable(index, domain, true);
                         variables.put(index, variable);
                     } else {
                         int[] values = new int[splitValues.length];
                         for (int i = 0; i < splitValues.length; i++) {
                             values[i] = Integer.parseInt(splitValues[i]);
                         }
-                        String[] emptyDomain = createZeroBitString(numberOfRows).split("");
+                        char[] emptyDomain = createZereoBitCharArray(numberOfRows);
                         ArrayList<Integer> domain = generateDomain(emptyDomain, values, 0, calculateWiggleRoom(values, numberOfRows), 0);
                         int index = counter - 1;
-                        Variable variable = new Variable(index, domain);
+                        NonogramVariable variable = new NonogramVariable(index, domain, false);
                         variables.put(index, variable);
                     }
                     counter++;
                 }
                 String maskPrefix = "0b";
-                String emptyRowMask = createZeroBitString(numberOfColumns);
-                String emptyColMask = createZeroBitString(numberOfRows);
 
                 for (int i = 0; i < numberOfRows; i++) {
                     for (int j = 0; j < numberOfColumns; j++) {
                         ArrayList<Variable> constraintVariables = new ArrayList<>();
                         constraintVariables.add(variables.get(i));
-                        constraintVariables.add(variables.get(j+numberOfRows));
-                        String[] rowMask = createZeroBitString(numberOfColumns).split("");
-                        rowMask[j] = "1";
-                        String[] colMask = createZeroBitString(numberOfRows).split("");
-                        colMask[i] = "1";
+                        constraintVariables.add(variables.get(j + numberOfRows));
+                        String rowMask = maskPrefix + createMask(numberOfColumns, j);
+                        String colMask = maskPrefix + createMask(numberOfRows, i);
                         String constraintExpression = "(x & " + rowMask + " == 0) == (y & " + colMask + " == 0)";
                         String[] variableNames = {"x","y"};
+                        System.out.println("("+i+","+j+"): "+constraintExpression);
                         ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, constraintExpression);
+                        System.out.println("HEIA");
                         Constraint constraint = new Constraint(constraintVariables, validator);
                         constraints.add(constraint);
                     }
@@ -81,13 +75,25 @@ public class NonogramReader {
             } catch (IOException io) {
                 System.err.println("Failed to read file");
             }
+            System.out.println(constraints.size());
             return new GAC(variables, constraints);
         }
         return null;
     }
 
-    public static String createZeroBitString(int n) {
-        return new String(new char[n]).replace("\0", "0");
+    public static String createMask(int n, int i) {
+        char[] chars = new char[n];
+        chars[i] = '1';
+        return new String(chars).replace("\0", "0");
+
+    }
+
+    public static char[] createZereoBitCharArray(int n) {
+        char[] chars = new char[n];
+        for (int i = 0; i < n; i++) {
+            chars[i] = '0';
+        }
+        return chars;
     }
 
     public static int calculateWiggleRoom(int[] values, int length) {
@@ -98,15 +104,15 @@ public class NonogramReader {
         return length - (occupiedSpace + (values.length - 1));
     }
 
-   public static ArrayList<Integer> generateDomain(String[] domainValue, int[] values, int valueIndex, int remainingWiggleRoom, int startIndex) {
+   public static ArrayList<Integer> generateDomain(char[] domainValue, int[] values, int valueIndex, int remainingWiggleRoom, int startIndex) {
         ArrayList<Integer> domain = new ArrayList<>();
         for (int i = startIndex ; i <= startIndex + remainingWiggleRoom; i++) {
-            String[] domainValueCopy = domainValue.clone();
+            char[] domainValueCopy = domainValue.clone();
             for (int j = i; j < i + values[valueIndex]; j++) {
-                domainValueCopy[j] = "1";
+                domainValueCopy[j] = '1';
             }
             if (valueIndex == (values.length - 1)) {
-                domain.add(Integer.parseInt(Arrays.toString(domainValueCopy), 2));
+                domain.add(Integer.parseInt(new String(domainValueCopy), 2));
             } else {
                 domain.addAll(generateDomain(domainValueCopy, values, valueIndex + 1, remainingWiggleRoom - (i - startIndex), i + values[valueIndex] + 1));
             }
