@@ -8,11 +8,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class NonogramReader {
 
     private static final int DIMENSIONS = 0;
+    private static HashMap<String, ArrayList<Integer>> domainHashMap = new HashMap<>();
 
     public static GAC loadFile(File file) {
         int numberOfColumns = 0;
@@ -36,7 +38,7 @@ public class NonogramReader {
                             values[i] = Integer.parseInt(splitValues[i]);
                         }
                         char[] emptyDomain = createZereoBitCharArray(numberOfColumns);
-                        ArrayList<Integer> domain = generateDomain(emptyDomain, values, 0, calculateWiggleRoom(values, numberOfColumns), 0);
+                        ArrayList<Integer> domain = getDomain(emptyDomain, values, 0, calculateWiggleRoom(values, numberOfColumns), 0);
                         int index = numberOfRows - (counter);
                         NonogramVariable variable = new NonogramVariable(index, domain, true);
                         variables.put(index, variable);
@@ -46,7 +48,7 @@ public class NonogramReader {
                             values[i] = Integer.parseInt(splitValues[i]);
                         }
                         char[] emptyDomain = createZereoBitCharArray(numberOfRows);
-                        ArrayList<Integer> domain = generateDomain(emptyDomain, values, 0, calculateWiggleRoom(values, numberOfRows), 0);
+                        ArrayList<Integer> domain = getDomain(emptyDomain, values, 0, calculateWiggleRoom(values, numberOfRows), 0);
                         int index = counter - 1;
                         NonogramVariable variable = new NonogramVariable(index, domain, false);
                         variables.put(index, variable);
@@ -101,7 +103,22 @@ public class NonogramReader {
         return length - (occupiedSpace + (values.length - 1));
     }
 
-   public static ArrayList<Integer> generateDomain(char[] domainValue, int[] values, int valueIndex, int remainingWiggleRoom, int startIndex) {
+    public static ArrayList<Integer> getDomain(char[] domainValue, int[] values, int valueIndex, int remainingWiggleRoom, int startIndex) {
+        String key = Arrays.toString(values) + domainValue.length;
+        if (domainHashMap.containsKey(key)) {
+            return copyDomain(domainHashMap.get(key));
+        } else {
+            ArrayList<Integer> domain = generateDomain(domainValue, values, valueIndex, remainingWiggleRoom, startIndex);
+            domainHashMap.put(key, domain);
+            return copyDomain(domain);
+        }
+    }
+
+    public static ArrayList<Integer> copyDomain(ArrayList<Integer> domain) {
+        return (ArrayList<Integer>) domain.clone();
+    }
+
+    public static ArrayList<Integer> generateDomain(char[] domainValue, int[] values, int valueIndex, int remainingWiggleRoom, int startIndex) {
         ArrayList<Integer> domain = new ArrayList<>();
         for (int i = startIndex ; i <= startIndex + remainingWiggleRoom; i++) {
             char[] domainValueCopy = domainValue.clone();
