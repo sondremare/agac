@@ -69,7 +69,7 @@ public class GACState implements State {
 
     @Override
     public float getGCost() {
-        return 1; //TODO WHAT TO DO
+        return 1;
     }
 
     @Override

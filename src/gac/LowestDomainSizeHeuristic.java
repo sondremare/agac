@@ -1,11 +1,11 @@
-package puzzles.vertexcoloring;
+package gac;
 
 import gac.GACState;
 import gac.VariableInstance;
 import search.Heuristic;
 import search.State;
 
-public class VertexHeuristic implements Heuristic {
+public class LowestDomainSizeHeuristic implements Heuristic {
 
     @Override
     public float calculateHeuristicValue(State state) {

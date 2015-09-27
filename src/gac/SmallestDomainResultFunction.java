@@ -1,4 +1,4 @@
-package puzzles.vertexcoloring;
+package gac;
 
 import gac.GAC;
 import gac.GACState;
@@ -10,7 +10,7 @@ import search.State;
 
 import java.util.*;
 
-public class VertexResultFunction implements ResultFunction {
+public class SmallestDomainResultFunction implements ResultFunction {
     private static final int DEDUCED = 1;
     @Override
     public ArrayList<State> result(ArrayList<Action> actions, State state) {

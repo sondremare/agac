@@ -64,9 +64,7 @@ public class NonogramReader {
                         String colMask = maskPrefix + createMask(numberOfRows, i);
                         String constraintExpression = "(x & " + rowMask + " == 0) == (y & " + colMask + " == 0)";
                         String[] variableNames = {"x","y"};
-                        System.out.println("("+i+","+j+"): "+constraintExpression);
                         ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, constraintExpression);
-                        System.out.println("HEIA");
                         Constraint constraint = new Constraint(constraintVariables, validator);
                         constraints.add(constraint);
                     }
@@ -75,7 +73,6 @@ public class NonogramReader {
             } catch (IOException io) {
                 System.err.println("Failed to read file");
             }
-            System.out.println(constraints.size());
             return new GAC(variables, constraints);
         }
         return null;

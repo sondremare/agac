@@ -9,6 +9,7 @@ import puzzles.navigation.GridState;
 import puzzles.navigation.NavigationPuzzle;
 import puzzles.navigation.Position;
 import search.Node;
+import search.Puzzle;
 import search.Search;
 
 import java.util.ArrayList;
@@ -30,8 +31,8 @@ public class NavigationGUI implements GUI{
     private static Label closedCountLabel;
     private static Label solutionLengthLabel;
 
-    public NavigationGUI(NavigationPuzzle puzzle) {
-        this.puzzle = puzzle;
+    public NavigationGUI(Puzzle puzzle) {
+        this.puzzle = (NavigationPuzzle) puzzle;
     }
 
     @Override

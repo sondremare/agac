@@ -11,6 +11,7 @@ import javafx.scene.shape.Line;
 import puzzles.vertexcoloring.VertexColoringPuzzle;
 import puzzles.vertexcoloring.VertexVariable;
 import search.Node;
+import search.Puzzle;
 import search.Search;
 
 import java.util.ArrayList;
@@ -26,8 +27,8 @@ public class VertexColoringGUI implements GUI {
     public static double HEIGHT = 700.0;
     public static double MARGIN = 30;
 
-    public VertexColoringGUI(VertexColoringPuzzle puzzle) {
-        this.puzzle = puzzle;
+    public VertexColoringGUI(Puzzle puzzle) {
+        this.puzzle = (VertexColoringPuzzle) puzzle;
     }
     @Override
     public GridPane initGUI() {

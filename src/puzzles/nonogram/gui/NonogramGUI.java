@@ -9,44 +9,54 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import puzzles.nonogram.NonogramPuzzle;
+import puzzles.nonogram.NonogramVariable;
 import puzzles.vertexcoloring.gui.Vertex;
+import search.Node;
+import search.Puzzle;
 import search.Search;
 
 public class NonogramGUI implements GUI{
     private NonogramPuzzle puzzle;
     private Pane pane;
-    public static double CELL_WIDTH = 10;
-    public static double CELL_HEIGHT = 10;
+    private Cell[][] cells;
+    private int rowCounter;
+    private int colCounter;
+    public static double CELL_WIDTH = 30;
+    public static double CELL_HEIGHT = 30;
     public static double MARGIN = 30;
 
-    public NonogramGUI(NonogramPuzzle puzzle) {
-        this.puzzle = puzzle;
+
+    public NonogramGUI(Puzzle puzzle) {
+        this.puzzle = (NonogramPuzzle)puzzle;
     }
 
     @Override
     public GridPane initGUI() {
+        rowCounter = 0;
+        colCounter = 0;
         GridPane root = new GridPane();
         GACState gacState = (GACState) puzzle.getState();
-        //clearAll();
-        /*pane = new Pane();
-        pane.setPrefSize(WIDTH + 2*MARGIN, HEIGHT + 2*MARGIN);
-        pane.setStyle("-fx-background-color: white;");
-        for (ConstraintInstance constraintInstance : gacState.getConstraintInstances()) {
-            Variable startVariable = constraintInstance.getVariableInstances().get(0).getOriginalVariable();
-            Variable endVariable = constraintInstance.getVariableInstances().get(1).getOriginalVariable();
-            double startX = startVariable.getxPos() + MARGIN;
-            double startY = startVariable.getyPos() + MARGIN;
-            double endX = endVariable.getxPos() + MARGIN;
-            double endY = endVariable.getyPos() + MARGIN;
-            Line line = new Line(startX, startY, endX, endY);
-            pane.getChildren().add(line);
-            lines.add(line);
-        }
         for (VariableInstance variableInstance : gacState.getVariableInstances().values()) {
-            Vertex vertex = new Vertex(variableInstance, Vertex.getColor(variableInstance.getCurrentDomain()));
-            pane.getChildren().add(vertex);
-            vertices.put(variableInstance.getIndex(), vertex);
-        }*/
+            if (((NonogramVariable)variableInstance.getOriginalVariable()).isRowVariable()) {
+                rowCounter++;
+                variableInstance.getCurrentDomain().get(0);
+            } else {
+                colCounter++;
+            }
+        }
+
+        pane = new Pane();
+        pane.setPrefSize(colCounter * CELL_WIDTH + 2*MARGIN, rowCounter * CELL_HEIGHT + 2*MARGIN);
+        pane.setStyle("-fx-background-color: white;");
+
+        cells = new Cell[rowCounter][colCounter];
+        for (int i = 0; i < rowCounter; i++) {
+            for (int j = 0; j < colCounter; j++) {
+                Cell cell = new Cell(i, j);
+                pane.getChildren().add(cell);
+                cells[i][j] = cell;
+            }
+        }
 
         root.add(pane, 0, 0);
         return root;
@@ -54,6 +64,34 @@ public class NonogramGUI implements GUI{
 
     @Override
     public void update(Search search) {
+        Node currentNode = search.getCurrentNode();
+        if (currentNode != null) {
+            GACState gacState = (GACState) currentNode.getState();
+            for (VariableInstance variableInstance : gacState.getVariableInstances().values()) {
+                int index = variableInstance.getIndex();
+                boolean isRowVariable = ((NonogramVariable)variableInstance.getOriginalVariable()).isRowVariable();
+                if (isRowVariable) {
+                    for (int i = 0; i < colCounter; i++) {
+                        cells[index][i].resolveColor(variableInstance, isRowVariable, colCounter);
+                    }
+                } else {
+                    for (int j = 0; j < rowCounter; j++) {
+                        cells[j][index-rowCounter].resolveColor(variableInstance, isRowVariable, rowCounter);
+                    }
+                }
+            }
+        }
 
+    }
+
+    public void clearAll() {
+        if (cells != null) {
+            for (int i = 0; i < cells.length; i++) {
+                for (int j = 0; j < cells[i].length; j++) {
+                    pane.getChildren().remove(cells[i][j]);
+                }
+
+            }
+        }
     }
 }

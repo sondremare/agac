@@ -6,7 +6,9 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -14,6 +16,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Callback;
+import puzzles.navigation.GridState;
+import puzzles.navigation.NavigationPuzzle;
+import puzzles.navigation.gui.NavigationGUI;
+import puzzles.navigation.io.file.GridReader;
 import puzzles.nonogram.NonogramPuzzle;
 import puzzles.nonogram.gui.NonogramGUI;
 import puzzles.nonogram.io.file.NonogramReader;
@@ -23,60 +30,115 @@ import puzzles.vertexcoloring.io.file.VertexReader;
 import search.*;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class Main extends Application {
 
-    //private NavigationPuzzle puzzle;
-    //private VertexColoringPuzzle puzzle;
-    private NonogramPuzzle puzzle;
+    private Puzzle puzzle;
     private GUI gui;
     private Search search;
     private File file;
     private GridPane gridPane;
+    private GridPane controlPane;
+    private GridPane guiRoot;
     private Button startSearchButton;
+    private ComboBox puzzleSelect;
+    private Label kValueLabel;
+    private TextField kValueInput;
+    private String activeResourcePath = navigationResourcePath;
 
-    public void initPuzzle(String kValue) {
-        /*try {
-            int kVal = Integer.parseInt(kValue);
-            startSearchButton.setDisable(true);
-            GAC gac = VertexReader.loadFile(file, kVal);
-            if (gac != null) {
-                GACState gacState = new GACState(gac);
-                puzzle = new VertexColoringPuzzle(gac, gacState);
-                gui = new VertexColoringGUI(puzzle);
-                GridPane guiRoot = gui.initGUI();
-                gridPane.add(guiRoot, 1, 0);
-                startSearchButton.setDisable(false);
-            } else {
-                startSearchButton.setDisable(true);
-            }
-        } catch (Exception e) {
-            //do nothing
-        }*/
-        try {
-            startSearchButton.setDisable(true);
-            GAC gac = NonogramReader.loadFile(file);
-            if (gac != null) {
-                GACState gacState = new GACState(gac);
-                puzzle = new NonogramPuzzle(gac, gacState);
-                gui = new NonogramGUI(puzzle);
-                GridPane guiRoot = gui.initGUI();
-                gridPane.add(guiRoot, 1, 0);
-                startSearchButton.setDisable(false);
-            } else {
-                startSearchButton.setDisable(true);
-            }
-        } catch (Exception e) {
-            //do nothing
+    private static final String navigationResourcePath = "D:\\School\\AiProgramming\\agac\\resources\\navigation\\";
+    private static final String vertexResourcePath = "D:\\School\\AiProgramming\\agac\\resources\\vertex\\";
+    private static final String nonogramResourcePath = "D:\\School\\AiProgramming\\agac\\resources\\nonogram\\";
+
+    public void initPuzzle() {
+        gridPane.getChildren().remove(guiRoot);
+        startSearchButton.setDisable(true);
+        PuzzleType puzzleType = (PuzzleType) puzzleSelect.getValue();
+        switch (puzzleType) {
+            case NAVIGATION:
+                GridState state = GridReader.loadFile(file);
+                if (state != null) {
+                    puzzle = new NavigationPuzzle(state);
+                    gui = new NavigationGUI(puzzle);
+                }
+                break;
+            case VERTEX_COLORING:
+                int kVal = Integer.parseInt(kValueInput.getText());
+                GAC gac = VertexReader.loadFile(file, kVal);
+                if (gac != null) {
+                    GACState gacState = new GACState(gac);
+                    puzzle = new VertexColoringPuzzle(gac, gacState);
+                    gui = new VertexColoringGUI(puzzle);
+                }
+                break;
+            case NONOGRAM:
+                GAC nonoGac = NonogramReader.loadFile(file);
+                if (nonoGac != null) {
+                    GACState gacState = new GACState(nonoGac);
+                    puzzle = new NonogramPuzzle(nonoGac, gacState);
+                    gui = new NonogramGUI(puzzle);
+                }
+                break;
         }
+        if (puzzle != null && gui != null) {
+            guiRoot = gui.initGUI();
+            gridPane.add(guiRoot, 1, 0);
+            startSearchButton.setDisable(false);
+        }
+    }
 
+    public void addKInputField() {
+        kValueLabel = new Label("K: ");
+        kValueInput = new TextField();
+        kValueInput.setMaxWidth(50);
+        kValueInput.setText("4");
 
+        kValueInput.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                initPuzzle();
+            }
+        });
+        controlPane.add(kValueLabel, 0, 6);
+        controlPane.add(kValueInput, 1, 6);
+    }
+
+    public void removeKInputField() {
+        controlPane.getChildren().remove(kValueLabel);
+        controlPane.getChildren().remove(kValueInput);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
 
+        controlPane = new GridPane();
         final FileChooser fileChooser = new FileChooser();
+
+        puzzleSelect = new ComboBox();
+        puzzleSelect.getItems().setAll(PuzzleType.values());
+        puzzleSelect.getSelectionModel().selectFirst();
+        puzzleSelect.valueProperty().addListener(new ChangeListener<PuzzleType>() {
+
+            @Override
+            public void changed(ObservableValue<? extends PuzzleType> observable, PuzzleType oldValue, PuzzleType newValue) {
+                if (newValue == PuzzleType.NAVIGATION) {
+                    System.out.println("nav");
+                    removeKInputField();
+                    activeResourcePath = navigationResourcePath;
+                } else if (newValue == PuzzleType.VERTEX_COLORING) {
+                    System.out.println("vertex");
+                    addKInputField();
+                    activeResourcePath = vertexResourcePath;
+                } else if (newValue == PuzzleType.NONOGRAM) {
+                    System.out.println("nono");
+                    removeKInputField();
+                    activeResourcePath = nonogramResourcePath;
+                }
+            }
+        });
 
         Button openFileButton = new Button("Choose file");
         startSearchButton = new Button("Start Search");
@@ -90,18 +152,6 @@ public class Main extends Application {
         sleepTimeInput.setMaxWidth(50);
         sleepTimeInput.setText("50");
 
-        Label kValueLabel = new Label("K: ");
-        final TextField kValueInput = new TextField();
-        kValueInput.setMaxWidth(50);
-        kValueInput.setText("4");
-
-        kValueInput.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                initPuzzle(newValue);
-            }
-        });
-
         ToggleGroup searchType = new ToggleGroup();
         RadioButton bestFirst = new RadioButton("Best-First");
         RadioButton depthFirst = new RadioButton("Depth-First");
@@ -112,17 +162,16 @@ public class Main extends Application {
         bestFirst.setSelected(true);
 
 
-        GridPane controlPane = new GridPane();
-        controlPane.add(openFileButton, 0, 0);
-        controlPane.add(bestFirst, 0, 1);
-        controlPane.add(depthFirst, 0, 2);
-        controlPane.add(breadthFirst, 0, 3);
-        controlPane.add(sleepTimeLabel, 0, 4);
-        controlPane.add(sleepTimeInput, 1, 4);
-        controlPane.add(kValueLabel, 0, 5);
-        controlPane.add(kValueInput, 1, 5);
-        controlPane.add(startSearchButton, 0, 6);
-        controlPane.add(stopSearchButton, 0, 7);
+
+        controlPane.add(puzzleSelect, 0, 0);
+        controlPane.add(openFileButton, 0, 1);
+        controlPane.add(bestFirst, 0, 2);
+        controlPane.add(depthFirst, 0, 3);
+        controlPane.add(breadthFirst, 0, 4);
+        controlPane.add(sleepTimeLabel, 0, 5);
+        controlPane.add(sleepTimeInput, 1, 5);
+        controlPane.add(startSearchButton, 0, 7);
+        controlPane.add(stopSearchButton, 0, 8);
 
         gridPane = new GridPane();
         gridPane.setPrefSize(1200, 800);
@@ -136,23 +185,12 @@ public class Main extends Application {
             public void handle(ActionEvent event) {
 
                 //TODO make this puzzle independant
-                File gridDirectory = new File("D:\\School\\AiProgramming\\agac\\resources\\nonogram\\");
+                File gridDirectory = new File(activeResourcePath);
                 if (gridDirectory != null && gridDirectory.exists()) {
                     fileChooser.setInitialDirectory(gridDirectory);
                 }
                 file = fileChooser.showOpenDialog(primaryStage);
-
-                /*GridState state = GridReader.loadFile(file);
-                if (state != null) {
-                    puzzle = new NavigationPuzzle(state);
-                    gui = new NavigationGUI(puzzle);
-                    GridPane guiRoot = gui.initGUI();
-                    gridPane.add(guiRoot, 0, 1);
-                    startSearchButton.setDisable(false);
-                } else {
-                    startSearchButton.setDisable(true);
-                }*/
-                initPuzzle(kValueInput.getText());
+                initPuzzle();
             }
         });
 
@@ -217,15 +255,24 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-        launch(args); //{0:05b}'.format(x)
-        //String[] variableNames = {"x","y"};
-        //ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, "bin(x) & 0b10000 == bin(y) & 0b01000");
-        //ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, "'{0:05b}'.format(x) & 0b10000 == '{0:05b}'.format(y) & 0b01000");
-        //ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, "(0b11100 & 0b10000) == (0b11110 & 0b01000)");
-        //ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, "(0b11100 & 0b10000 == 0) == (0b11110 & 0b01000 == 0)");
-       // ConstraintValidator validator = ConstraintValidatorFactory.createConstraint(variableNames, "(x & 0b10000 == 0) == (y & 0b01000 == 0)");
-       // int[] values = {Integer.parseInt("01100",2), Integer.parseInt("10110", 2)};
-        //System.out.println(validator.check(values));
+        launch(args);
+    }
 
+    private enum PuzzleType {
+
+        NAVIGATION("NavigationPuzzle"),
+        VERTEX_COLORING("VertexColoringPuzzle"),
+        NONOGRAM("NonogramPuzzle");
+
+        private final String name;
+
+        private PuzzleType(final String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }

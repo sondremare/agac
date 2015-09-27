@@ -1,28 +1,27 @@
 package puzzles.vertexcoloring;
 
-        import gac.GAC;
-        import gac.GACState;
+        import gac.*;
         import search.*;
 
 public class VertexColoringPuzzle implements Puzzle{
 
     private GAC gac;
     private GACState gacState;
-    private VertexResultFunction vertexResultFunction;
-    private VertexHeuristic vertexHeuristic;
-    private VertexGoalTest vertexGoalTest;
+    private SmallestDomainResultFunction resultFunction;
+    private LowestDomainSizeHeuristic heuristic;
+    private GACDeducedDomainsGoalTest goalTest;
 
     public VertexColoringPuzzle(GAC gac, GACState gacState) {
         this.gac = gac;
         this.gacState = gacState;
-        this.vertexResultFunction = new VertexResultFunction();
-        this.vertexHeuristic = new VertexHeuristic();
-        this.vertexGoalTest = new VertexGoalTest();
+        this.resultFunction = new SmallestDomainResultFunction();
+        this.heuristic = new LowestDomainSizeHeuristic();
+        this.goalTest = new GACDeducedDomainsGoalTest();
     }
 
     @Override
     public Heuristic getHeuristic() {
-        return vertexHeuristic;
+        return heuristic;
     }
 
     @Override
@@ -32,7 +31,7 @@ public class VertexColoringPuzzle implements Puzzle{
 
     @Override
     public ResultFunction getResultFunction() {
-        return vertexResultFunction;
+        return resultFunction;
     }
 
     @Override
@@ -42,6 +41,6 @@ public class VertexColoringPuzzle implements Puzzle{
 
     @Override
     public GoalTest getGoalTest() {
-        return vertexGoalTest;
+        return goalTest;
     }
 }

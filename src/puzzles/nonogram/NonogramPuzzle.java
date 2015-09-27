@@ -2,25 +2,25 @@ package puzzles.nonogram;
 
 import gac.GAC;
 import gac.GACState;
-import puzzles.vertexcoloring.VertexGoalTest;
-import puzzles.vertexcoloring.VertexHeuristic;
-import puzzles.vertexcoloring.VertexResultFunction;
+import gac.GACDeducedDomainsGoalTest;
+import gac.LowestDomainSizeHeuristic;
+import gac.SmallestDomainResultFunction;
 import search.*;
 
 public class NonogramPuzzle implements Puzzle {
 
     private GAC gac;
     private GACState gacState;
-    private VertexResultFunction vertexResultFunction;
-    private VertexHeuristic heuristic;
-    private VertexGoalTest goalTest;
+    private SmallestDomainResultFunction resultfunction;
+    private LowestDomainSizeHeuristic heuristic;
+    private GACDeducedDomainsGoalTest goalTest;
 
     public NonogramPuzzle(GAC gac, GACState gacState) {
         this.gac = gac;
         this.gacState = gacState;
-        this.vertexResultFunction = new VertexResultFunction();
-        this.heuristic = new VertexHeuristic();
-        this.goalTest = new VertexGoalTest();
+        this.resultfunction = new SmallestDomainResultFunction();
+        this.heuristic = new LowestDomainSizeHeuristic();
+        this.goalTest = new GACDeducedDomainsGoalTest();
     }
 
 
@@ -36,7 +36,7 @@ public class NonogramPuzzle implements Puzzle {
 
     @Override
     public ResultFunction getResultFunction() {
-        return vertexResultFunction;
+        return resultfunction;
     }
 
     @Override
