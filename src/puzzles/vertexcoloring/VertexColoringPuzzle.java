@@ -1,7 +1,7 @@
 package puzzles.vertexcoloring;
 
-        import gac.*;
-        import search.*;
+import gac.*;
+import search.*;
 
 public class VertexColoringPuzzle implements Puzzle{
 

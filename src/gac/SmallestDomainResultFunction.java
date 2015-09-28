@@ -1,9 +1,5 @@
 package gac;
 
-import gac.GAC;
-import gac.GACState;
-import gac.Variable;
-import gac.VariableInstance;
 import search.Action;
 import search.ResultFunction;
 import search.State;

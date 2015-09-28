@@ -2,7 +2,6 @@ package puzzles.vertexcoloring.gui;
 
 import gac.ConstraintInstance;
 import gac.GACState;
-import gac.Variable;
 import gac.VariableInstance;
 import gui.GUI;
 import javafx.scene.layout.GridPane;

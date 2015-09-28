@@ -3,7 +3,6 @@ package puzzles.nonogram.gui;
 import gac.VariableInstance;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import puzzles.nonogram.NonogramVariable;
 
 import java.util.ArrayList;
 

@@ -4,7 +4,6 @@ import gac.VariableInstance;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import puzzles.vertexcoloring.VertexVariable;
-import puzzles.vertexcoloring.gui.VertexColoringGUI;
 
 import java.util.ArrayList;
 

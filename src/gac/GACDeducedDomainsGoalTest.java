@@ -1,9 +1,5 @@
 package gac;
 
-import gac.ConstraintInstance;
-import gac.ConstraintValidator;
-import gac.GACState;
-import gac.VariableInstance;
 import search.GoalTest;
 import search.State;
 

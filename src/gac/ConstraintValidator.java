@@ -3,8 +3,6 @@ package gac;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
-import java.util.ArrayList;
-
 public class ConstraintValidator {
     private PyObject pyObject;
 

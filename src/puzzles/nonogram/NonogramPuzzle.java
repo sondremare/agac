@@ -1,10 +1,6 @@
 package puzzles.nonogram;
 
-import gac.GAC;
-import gac.GACState;
-import gac.GACDeducedDomainsGoalTest;
-import gac.LowestDomainSizeHeuristic;
-import gac.SmallestDomainResultFunction;
+import gac.*;
 import search.*;
 
 public class NonogramPuzzle implements Puzzle {

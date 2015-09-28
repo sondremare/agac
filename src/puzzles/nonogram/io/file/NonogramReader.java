@@ -1,7 +1,7 @@
 package puzzles.nonogram.io.file;
 
 import gac.*;
-import puzzles.nonogram.NonogramVariable;
+import puzzles.nonogram.NonogramVariable2;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -40,7 +40,7 @@ public class NonogramReader {
                         char[] emptyDomain = createZereoBitCharArray(numberOfColumns);
                         ArrayList<Integer> domain = getDomain(emptyDomain, values, 0, calculateWiggleRoom(values, numberOfColumns), 0);
                         int index = numberOfRows - (counter);
-                        NonogramVariable variable = new NonogramVariable(index, domain, true);
+                        NonogramVariable2 variable = new NonogramVariable2(index, domain, true);
                         variables.put(index, variable);
                     } else {
                         int[] values = new int[splitValues.length];
@@ -50,7 +50,7 @@ public class NonogramReader {
                         char[] emptyDomain = createZereoBitCharArray(numberOfRows);
                         ArrayList<Integer> domain = getDomain(emptyDomain, values, 0, calculateWiggleRoom(values, numberOfRows), 0);
                         int index = counter - 1;
-                        NonogramVariable variable = new NonogramVariable(index, domain, false);
+                        NonogramVariable2 variable = new NonogramVariable2(index, domain, false);
                         variables.put(index, variable);
                     }
                     counter++;

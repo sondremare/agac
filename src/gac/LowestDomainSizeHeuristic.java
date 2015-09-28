@@ -1,7 +1,5 @@
 package gac;
 
-import gac.GACState;
-import gac.VariableInstance;
 import search.Heuristic;
 import search.State;
 
