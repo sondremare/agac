@@ -232,7 +232,12 @@ public class Main extends Application {
 
                     @Override
                     public void run() {
-                        search.search();
+                        if (search.search()) {
+                            showMessage("Search successful");
+                        } else {
+                            showMessage("Could not find a solution");
+                        }
+
                     }
                 }).start();
             }
@@ -243,6 +248,19 @@ public class Main extends Application {
             public void handle(ActionEvent event) {
                 search.stop();
                 stopSearchButton.setDisable(true);
+            }
+        });
+    }
+
+    public void showMessage(String message) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("A* Search");
+                alert.setHeaderText(null);
+                alert.setContentText(message);
+                alert.showAndWait();
             }
         });
     }

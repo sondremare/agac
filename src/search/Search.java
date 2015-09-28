@@ -127,8 +127,7 @@ public class Search {
 
             /** We check if the current search node is in the desired goal state */
             if (puzzle.getGoalTest().isGoalState(currentNode.getState())) {
-                System.out.println("GOAL");
-                break;
+                return true;
             }
 
             /** We generate all neighbouring/successor nodes of the current node */
@@ -175,6 +174,6 @@ public class Search {
                 }
             }
         }
-        return true;
+        return false;
     }
 }
