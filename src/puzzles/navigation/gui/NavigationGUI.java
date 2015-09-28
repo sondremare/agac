@@ -27,9 +27,6 @@ public class NavigationGUI implements GUI{
     private static ArrayList<ImageView> solutionReference;
     private final static int CELL_WIDTH = 30;
     private final static int CELL_HEIGHT = 30;
-    private static Label openCountLabel;
-    private static Label closedCountLabel;
-    private static Label solutionLengthLabel;
 
     public NavigationGUI(Puzzle puzzle) {
         this.puzzle = (NavigationPuzzle) puzzle;
@@ -42,23 +39,12 @@ public class NavigationGUI implements GUI{
         GridState state = (GridState) puzzle.getState();
         clearGrid();
 
-        GridPane infoGrid = new GridPane();
-        infoGrid.setPrefSize(600, 200);
-        infoGrid.setHgap(10);
-        closedCountLabel = new Label("Closed: ");
-        openCountLabel = new Label("Open: ");
-        solutionLengthLabel = new Label("Solution: ");
-        infoGrid.add(closedCountLabel, 0, 0);
-        infoGrid.add(openCountLabel, 1, 0);
-        infoGrid.add(solutionLengthLabel, 2, 0);
-
         referenceArray = new ImageView[state.getHeight()][state.getWidth()];
         navigationGrid = new GridPane();
         navigationGrid.setPrefSize(600, 800);
         navigationGrid.setGridLinesVisible(true);
         updateImages(state);
-        root.add(infoGrid, 0, 0);
-        root.add(navigationGrid, 0, 1);
+        root.add(navigationGrid, 0, 0);
         return root;
     }
 
@@ -90,7 +76,6 @@ public class NavigationGUI implements GUI{
                 navigationGrid.add(imageView, xPos, yPos);
                 solutionReference.add(imageView);
             }
-            updateLabels(search, solutionChain.size());
         }
     }
 
@@ -118,12 +103,6 @@ public class NavigationGUI implements GUI{
                 referenceArray[i][j] = imageView;
             }
         }
-    }
-
-    public void updateLabels(Search search, int solutionSize) {
-        openCountLabel.setText("Open: "+search.getObservableOpenList().size());
-        closedCountLabel.setText("Closed: "+search.getObservableClosedList().size());
-        solutionLengthLabel.setText("Solution: "+solutionSize);
     }
 
     public void clearGrid() {

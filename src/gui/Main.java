@@ -1,7 +1,6 @@
 package gui;
 
-import gac.GAC;
-import gac.GACState;
+import gac.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -27,6 +26,7 @@ import puzzles.vertexcoloring.io.file.VertexReader;
 import search.*;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class Main extends Application {
 
@@ -42,6 +42,12 @@ public class Main extends Application {
     private Label kValueLabel;
     private TextField kValueInput;
     private String activeResourcePath = navigationResourcePath;
+    private Label openCountLabel;
+    private Label closedCountLabel;
+    private Label solutionLengthLabel;
+    private Label violatedConstraintsLabel;
+    private Label unassignedDomainsLabel;
+    private GridPane infoPane;
 
     private static final String navigationResourcePath = "D:\\School\\AiProgramming\\agac\\resources\\navigation\\";
     private static final String vertexResourcePath = "D:\\School\\AiProgramming\\agac\\resources\\vertex\\";
@@ -82,6 +88,30 @@ public class Main extends Application {
             gridPane.add(guiRoot, 1, 0);
             startSearchButton.setDisable(false);
         }
+        initInfoLabels();
+    }
+
+    public void initInfoLabels() {
+        if (infoPane != null) {
+            controlPane.getChildren().remove(infoPane);
+        }
+        openCountLabel = new Label("Open: ");
+        closedCountLabel = new Label("Closed: ");
+        solutionLengthLabel = new Label("Solution length: ");
+        violatedConstraintsLabel = new Label("Violated constraints: ");
+        unassignedDomainsLabel = new Label("Non-deduced domains: ");
+
+        infoPane = new GridPane();
+        infoPane.add(openCountLabel, 0, 0);
+        infoPane.add(closedCountLabel, 0, 1);
+        infoPane.add(solutionLengthLabel, 0, 2);
+        PuzzleType puzzleType = (PuzzleType) puzzleSelect.getValue();
+        if (puzzleType == PuzzleType.VERTEX_COLORING || puzzleType == PuzzleType.NONOGRAM) {
+            infoPane.add(violatedConstraintsLabel, 0, 3);
+            infoPane.add(unassignedDomainsLabel, 0, 4);
+        }
+
+        controlPane.add(infoPane, 0, 9);
     }
 
     public void addKInputField() {
@@ -119,15 +149,12 @@ public class Main extends Application {
             @Override
             public void changed(ObservableValue<? extends PuzzleType> observable, PuzzleType oldValue, PuzzleType newValue) {
                 if (newValue == PuzzleType.NAVIGATION) {
-                    System.out.println("nav");
                     removeKInputField();
                     activeResourcePath = navigationResourcePath;
                 } else if (newValue == PuzzleType.VERTEX_COLORING) {
-                    System.out.println("vertex");
                     addKInputField();
                     activeResourcePath = vertexResourcePath;
                 } else if (newValue == PuzzleType.NONOGRAM) {
-                    System.out.println("nono");
                     removeKInputField();
                     activeResourcePath = nonogramResourcePath;
                 }
@@ -168,7 +195,7 @@ public class Main extends Application {
         controlPane.add(stopSearchButton, 0, 8);
 
         gridPane = new GridPane();
-        gridPane.setPrefSize(1200, 800);
+        gridPane.setPrefSize(1400, 800);
         gridPane.add(controlPane, 0, 0);
 
         primaryStage.setScene(new Scene(gridPane));
@@ -177,8 +204,6 @@ public class Main extends Application {
         openFileButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
-                //TODO make this puzzle independant
                 File gridDirectory = new File(activeResourcePath);
                 if (gridDirectory != null && gridDirectory.exists()) {
                     fileChooser.setInitialDirectory(gridDirectory);
@@ -212,6 +237,7 @@ public class Main extends Application {
                             @Override
                             public void run() {
                                 gui.update(search);
+                                updateLabels(search);
                             }
                         });
                     }
@@ -223,6 +249,7 @@ public class Main extends Application {
                             @Override
                             public void run() {
                                 gui.update(search);
+                                updateLabels(search);
                             }
                         });
                     }
@@ -250,6 +277,52 @@ public class Main extends Application {
                 stopSearchButton.setDisable(true);
             }
         });
+    }
+
+    public void updateLabels(Search search) {
+        Node currentNode = search.getCurrentNode();
+        if (currentNode != null) {
+            PuzzleType puzzleType = (PuzzleType) puzzleSelect.getValue();
+            if (puzzleType == PuzzleType.VERTEX_COLORING || puzzleType == PuzzleType.NONOGRAM) {
+                GACState gacState = (GACState) currentNode.getState();
+                int unassignedDomainsCounter = 0;
+                int violatedConstraintsCounter = 0;
+                for (ConstraintInstance constraintInstance : gacState.getConstraintInstances()) {
+                    ConstraintValidator validator = constraintInstance.getOriginalConstraint().getConstraintValidator();
+                    ArrayList<VariableInstance> variableInstances = constraintInstance.getVariableInstances();
+                    int values[] = new int[variableInstances.size()];
+                    boolean readyForValidation = true;
+                    for (int i = 0; i < variableInstances.size(); i++) {
+                        ArrayList<Integer> currentDomain = variableInstances.get(i).getCurrentDomain();
+                        if (currentDomain.size() != 1) {
+                            readyForValidation = false;
+                            unassignedDomainsCounter++;
+
+                        } else {
+                            values[i] = currentDomain.get(0);
+                        }
+                    }
+                    if (readyForValidation) {
+                        if (!validator.check(values)) {
+                            violatedConstraintsCounter++;
+                        }
+                    }
+                }
+                violatedConstraintsLabel.setText("Violated constraints: "+violatedConstraintsCounter);
+                unassignedDomainsLabel.setText("Non-deduced domains: "+unassignedDomainsCounter);
+            }
+
+
+            int solutionLength = 0;
+            while (currentNode != null) {
+                currentNode = currentNode.getParent();
+                solutionLength++;
+            }
+            openCountLabel.setText("Open: "+search.getObservableOpenList().size());
+            closedCountLabel.setText("Closed: "+search.getObservableClosedList().size());
+            solutionLengthLabel.setText("Solution length: "+solutionLength);
+
+        }
     }
 
     public void showMessage(String message) {
