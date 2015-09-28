@@ -6,7 +6,7 @@ import gui.GUI;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import puzzles.nonogram.NonogramPuzzle;
-import puzzles.nonogram.NonogramVariable2;
+import puzzles.nonogram.NonogramVariable;
 import search.Node;
 import search.Puzzle;
 import search.Search;
@@ -33,7 +33,7 @@ public class NonogramGUI implements GUI{
         GridPane root = new GridPane();
         GACState gacState = (GACState) puzzle.getState();
         for (VariableInstance variableInstance : gacState.getVariableInstances().values()) {
-            if (((NonogramVariable2)variableInstance.getOriginalVariable()).isRowVariable()) {
+            if (((NonogramVariable)variableInstance.getOriginalVariable()).isRowVariable()) {
                 rowCounter++;
                 variableInstance.getCurrentDomain().get(0);
             } else {
@@ -65,7 +65,7 @@ public class NonogramGUI implements GUI{
             GACState gacState = (GACState) currentNode.getState();
             for (VariableInstance variableInstance : gacState.getVariableInstances().values()) {
                 int index = variableInstance.getIndex();
-                boolean isRowVariable = ((NonogramVariable2)variableInstance.getOriginalVariable()).isRowVariable();
+                boolean isRowVariable = ((NonogramVariable)variableInstance.getOriginalVariable()).isRowVariable();
                 if (isRowVariable) {
                     for (int i = 0; i < colCounter; i++) {
                         cells[index][i].resolveColor(variableInstance, isRowVariable, colCounter);
