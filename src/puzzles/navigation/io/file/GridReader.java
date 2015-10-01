@@ -17,8 +17,10 @@ public class GridReader {
         char[][] grid = new char[0][0];
         int height = 0;
         int width = 0;
-        int[] start = new int[0];
-        int[] goal = new int[0];
+        int startX = 0;
+        int startY = 0;
+        int goalX = 0;
+        int goalY = 0;
 
         if (file != null) {
             try {
@@ -28,23 +30,24 @@ public class GridReader {
                 int counter = 0;
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
-                    String[] splitGroups = line.split("\\)");
+                    String[] splitGroups = line.split(" ");
                     if (counter == DIMENSIONS) {
-                        int[] dimensions = getGroup(splitGroups[0]);
-                        height = dimensions[0];
-                        width = dimensions[1];
-                        grid = new char[dimensions[0]][dimensions[1]];
+                        width = Integer.parseInt(splitGroups[0]);
+                        height = Integer.parseInt(splitGroups[1]);
+                        grid = new char[width][height];
                     } else if (counter == START_AND_GOAL) {
-                        start = getGroup(splitGroups[0]);
-                        goal = getGroup(splitGroups[1]);
-                        grid[start[0]][start[1]] = GridState.START;
-                        grid[goal[0]][goal[1]] = GridState.GOAL;
+
+                        startX = Integer.parseInt(splitGroups[0]);
+                        startY = Integer.parseInt(splitGroups[1]);
+                        goalX = Integer.parseInt(splitGroups[2]);
+                        goalY = Integer.parseInt(splitGroups[3]);
+                        grid[startX][startY] = GridState.START;
+                        grid[goalX][goalY] = GridState.GOAL;
                     } else {
-                        int[] barrier = getGroup(splitGroups[0]);
-                        int barrierX = barrier[0];
-                        int barrierY = barrier[1];
-                        int barrierWidth = barrier[2];
-                        int barrierHeight = barrier[3];
+                        int barrierX = Integer.parseInt(splitGroups[0]);
+                        int barrierY = Integer.parseInt(splitGroups[1]);
+                        int barrierWidth = Integer.parseInt(splitGroups[2]);
+                        int barrierHeight = Integer.parseInt(splitGroups[3]);
                         for (int i = barrierX; i < barrierX + barrierWidth; i++) {
                             for (int j = barrierY; j < barrierY + barrierHeight; j++) {
                                 grid[i][j] = GridState.BARRIER;
@@ -57,7 +60,7 @@ public class GridReader {
             } catch (IOException io) {
                 System.err.println("Failed to read file");
             }
-            return new GridState(grid, height, width, new Position(start), new Position(goal), new Position(start));
+            return new GridState(grid, height, width, new Position(startX, startY), new Position(goalX, goalY), new Position(startX, startY));
         }
         return null;
     }
