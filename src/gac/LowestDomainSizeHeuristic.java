@@ -11,9 +11,6 @@ public class LowestDomainSizeHeuristic implements Heuristic {
         int domainSizeCounter = 0;
         for (VariableInstance variableInstance : gacState.getVariableInstances().values()) {
             int domainSize = variableInstance.getCurrentDomain().size();
-            if (domainSize == 0) {
-                System.err.println("DOMAIN IS ZERO IN HEURISTIC ERRO ERROR");
-            }
             if (domainSize > 1) {
                 domainSizeCounter += domainSize-1;
             }
