@@ -45,6 +45,7 @@ public class VertexColoringGUI implements GUI {
             double endX = endVariable.getxPos() + MARGIN;
             double endY = endVariable.getyPos() + MARGIN;
             Line line = new Line(startX, startY, endX, endY);
+            line.setStrokeWidth(0.3);
             pane.getChildren().add(line);
             lines.add(line);
         }
